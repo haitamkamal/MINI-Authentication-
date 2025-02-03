@@ -1,24 +1,45 @@
-const express = require("express");
-const app = express();
+/////// app.js
+const path = require("node:path");
 const { Pool } = require("pg");
+const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-const SingUpRouter = require("./routes/SingUpRouter");
-const path = require("node:path");
+const LocalStrategy = require('passport-local').Strategy;
 
+//DATABASE
+const pool = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "singup",
+  password: "123",
+  port: 5432,
+});
 
-// Views
+//Views
+const app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-// Passport Configuration
+//PASSPORT
 app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
-app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
-// Routes
-app.use("/", SingUpRouter);
-const PORT = 3000;
-app.listen(PORT, () => console.log(`This server is listening on port ${PORT}`));
+//ROUTES
+app.get("/", (req, res) => res.render("index"));
+app.get("/sign-up", (req, res) => res.render("singUpForm"));
+
+app.post("/sign-up", async (req, res, next) => {
+  try {
+    await pool.query("INSERT INTO users_form (username, password) VALUES ($1, $2)", [
+      req.body.username,
+      req.body.password,
+    ]);
+    res.redirect("/");
+  } catch(err) {
+    return next(err);
+  }
+});
+
+// SERVER
+app.listen(3000, () => console.log("app listening on port 3000!"));
