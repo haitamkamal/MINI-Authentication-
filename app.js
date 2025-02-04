@@ -40,7 +40,7 @@ app.post(
   "/log-in",
   passport.authenticate("local", {
     successRedirect:"/",
-    failureRedirect: "/"
+    failureRedirect: "/not-defined"
   })
 )
 app.get("/log-out",(req,res,next)=>{
@@ -51,8 +51,9 @@ app.get("/log-out",(req,res,next)=>{
     res.redirect("/");
   })
 })
-
-
+app.get("/not-defined",(req,res)=>{
+  res.render("NotDefinedUser")
+})
 app.post("/sign-up", async (req, res, next) => {
   try {
     await pool.query("INSERT INTO users_form (username, password) VALUES ($1, $2)", [
@@ -64,6 +65,10 @@ app.post("/sign-up", async (req, res, next) => {
     return next(err);
   }
 });
+app.get("*",(req,res)=>{
+  res.render("error");
+})
+
 //PASSPORT ....
 passport.use(
   new LocalStrategy(async (username, password, done) => {
