@@ -8,10 +8,10 @@ const LocalStrategy = require('passport-local').Strategy;
 
 //DATABASE
 const pool = new Pool({
-  user: "",
+  user: "postgres",
   host: "localhost",
-  database: "",
-  password: "",
+  database: "singup",
+  password: "123",
   port: 5432,
 });
 
@@ -68,8 +68,13 @@ app.post("/sign-up", async (req, res, next) => {
 app.get("*",(req,res)=>{
   res.render("error");
 })
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
 
 //PASSPORT ....
+//takes a username and password, tries to find the user in our DB
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -88,6 +93,7 @@ passport.use(
     }
   })
 );
+//They control how user information is stored in the session and retrieved from the database.
 passport.serializeUser((user,done)=>{
   done(null,user.id);
 });
