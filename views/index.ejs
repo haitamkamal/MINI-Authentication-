@@ -3,10 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+
+  <title>Home</title>
 </head>
+ <h1>Home</h1>
 <body>
-    <p>Index</p>
-    <a href="/sign-up">go login</a>
+     <% if (locals.user) {%>
+    <h1>WELCOME BACK <%= user.username %></h1>
+    <a href="/log-out">LOG OUT</a>
+  <% } else { %>
+    <a href="/sign-up">go sing up</a><br><br>
+    <a href="/log-in">go login</a>
+      <%}%>
+
 </body>
 </html>
